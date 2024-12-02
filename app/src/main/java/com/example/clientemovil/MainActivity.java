@@ -1,30 +1,49 @@
 package com.example.clientemovil;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 public class MainActivity extends AppCompatActivity {
-TextView respuesta, mensaje;
+
+    private TextView txtResq; // Variable para el TextView que muestra la respuesta
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
 
-        });
-        Button button = findViewById(R.id.bttComunicacion);
-        respuesta=findViewById(R.id.txtResq);
-        mensaje=findViewById(R.id.txtMensaje);
+        // Inicializar el TextView y el botón
+        txtResq = findViewById(R.id.txtResq);
+        Button sendRequestButton = findViewById(R.id.bttComunicacion);
+
+        // Configurar el botón para realizar la solicitud al hacer clic
+        sendRequestButton.setOnClickListener(v -> enviarSolicitud());
+    }
+
+    private void enviarSolicitud() {
+        // URL del servidor para la solicitud
+        String url = "http://10.10.13.47:3000/mensaje";
+
+        // Crear la solicitud GET usando Volley
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    // Actualizar la interfaz de usuario con la respuesta del servidor
+                    txtResq.setText(response);
+                },
+                error -> {
+                    // Mostrar un mensaje de error en el TextView si la solicitud falla
+                    txtResq.setText("Error en la solicitud: " + error.getMessage());
+                });
+
+        // Crear una cola de solicitudes y agregar la solicitud
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 }
